@@ -1,3 +1,7 @@
+//
+// header file for thread structure
+//
+
 #include <signal.h>
 #include <stack.h>
 #include <context.h>
