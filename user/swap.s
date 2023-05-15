@@ -1,6 +1,6 @@
 # Context swap
 #
-#   void swao(struct context *old, struct context *new);
+#   void swap(struct context *old, struct context *new);
 # 
 # Save current registers in old. Load from new.	
 # Change Return Address
