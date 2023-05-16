@@ -8,7 +8,7 @@
 
 
 typedef struct {
-	stack_t uc_stack;
+	void* uc_stack;
 	mcontext_t uc_mcontext;
 	int id;
 	void* fn_ptr;

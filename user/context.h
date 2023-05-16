@@ -3,9 +3,15 @@
 // defines register storage, register list, and context struct
 //
 
-typedef unsigned long int greg_t;
+typedef uint64 greg_t;
 
+//rewrite gregs into 14 different pointers for each register
 
-typedef struct {
-	greg_t gregs[14];
-} mcontext_t;
+typedef struct gregset
+   {
+     greg_t gregs[14];
+   } mcontext_t;
+
+// typedef struct {
+// 	gregset_t regset;
+// } mcontext_t;

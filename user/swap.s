@@ -1,6 +1,6 @@
 # Context swap
 #
-#   void swap(struct context *old, struct context *new);
+#   void swap(struct greg_t *old, struct greg_t *new);
 # 
 # Save current registers in old. Load from new.	
 # Change Return Address
