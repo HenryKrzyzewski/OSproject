@@ -107,7 +107,7 @@ $U/_forktest: $U/forktest.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $U/ulib.o $U/usys.o
 	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
 
-$U/swap.0: $U/swap.s
+$U/swap.o: $U/swap.s
 	$(CC) $(CFLAGS) -c -o $U/swap.o $U/swap.s
 
 mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
