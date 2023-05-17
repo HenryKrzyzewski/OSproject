@@ -3,10 +3,10 @@
  *
  *
  */
-#include <uspace_threads.h>
+#include "uspace_threads.h"
 
 //Pass in old and new contexts
-extern void swap(gregset_t*, gregset_t*);
+extern void swap(greg_t*, greg_t*);
 
 void makecontext(ucontext_t* thread, void* func, int argc, void* argv){
     // for(int i = 0; i < argc; i++) {
@@ -17,13 +17,13 @@ void makecontext(ucontext_t* thread, void* func, int argc, void* argv){
 
     //set fn_ptr to fun
     thread->uc_mcontext.gregs[0] = (unsigned long int) &func;
-    threed->uc_mcontext.gregs[1] = (unsigned long int) thread->uc_stack;
-    *thread.fn_ptr = func;
+    thread->uc_mcontext.gregs[1] = (unsigned long int) thread->uc_stack;
+    thread->fn_ptr = func;
     // *thread.uc_mcontext = ;
 }
 
 void swapcontext(ucontext_t* oldThread, ucontext_t* newThread) {
     //load registers from stack into a buffer
     //store registers from old context onto 
-    swap(oldThread.uc_mcontext.gregs, newThread.uc_mcontext.gregs);
+    swap(oldThread->uc_mcontext.gregs, newThread->uc_mcontext.gregs);
 }

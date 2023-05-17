@@ -1,10 +1,7 @@
 //
 // Header file for stack structure
 //
-
-
-#include <signal.h> 
-
+#include <stddef.h>
 
 typedef struct {
         void  *ss_sp;     /* Base address of stack */
