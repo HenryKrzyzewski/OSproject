@@ -3,16 +3,11 @@
  *
  *
  */
-#include "ucontext.h"
+#include "kernel/types.h"
+#include "uspace_threads.h"
 
 //Pass in old and new contexts
 extern void swap(greg_t*, greg_t*);
-
-void getcontext(ucontext_t * thread) {
-    
-    mcontext_t mcontext = {};
-    thread->uc_mcontext = mcontext;
-}
 
 void makecontext(ucontext_t* thread, void* func
 //, void* argv1 = 0, void* argv2 = 0, void* argv3 = 0, void* argv4 = 0, void* argv5 = 0, void* argv6 = 0, void* argv7 = 0, void* argv8 = 0

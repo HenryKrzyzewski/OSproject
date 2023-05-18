@@ -1,8 +1,12 @@
-#include <malloc.h>
-#include <ucontext.h>
-#include <stdio.h>
+// #include <malloc.h>
+// #include <ucontext.h>
+// #include <stdio.h>
 
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
 #include "basic_threads.h"
+#include "uspace_threads.h"
 
 // 64kB stack
 #define THREAD_STACK_SIZE 1024*64
@@ -11,6 +15,9 @@
    max number of threads
    */
 #define MAX_THREADS 5
+typedef int bool;
+#define false 0
+#define true 1
 
 // storage for your thread data
 ucontext_t threads[MAX_THREADS];
@@ -44,28 +51,26 @@ void create_new_thread(void (*fun_ptr)()) {
       i++;
    }
   if(i >= MAX_THREADS) {
-   perror("max: Ran out of threads");
+   // perror("max: Ran out of threads");
    exit(1);
   }
    ucontext_t nThread;
   // Get the current execution context
-  nThread = {}
+//   nThread = {}
 
   // Modify the context to a new stack
-  nThread.uc_link = 0;
-  nThread.uc_stack.ss_sp = malloc(THREAD_STACK_SIZE);
-  nThread.uc_stack.ss_size = THREAD_STACK_SIZE;
-  nThread.uc_stack.ss_flags = 0;
-  if (nThread.uc_stack.ss_sp == 0)
+  nThread.original = malloc(THREAD_STACK_SIZE); //need to properly 
+  nThread.uc_stack = nThread.original + THREAD_STACK_SIZE;
+  if (nThread.original == 0)
   {
-    perror("malloc: Could not allocate stack");
+   //  perror("malloc: Could not allocate stack");
     exit(1);
   }
 
   // Create the new context
 //   void (*intermediatePtr)() = (void(*)()) &intermediate;
-   void (* intermediatePtr)() = (void(*)()) &intermediate;
-  makecontext(&nThread, intermediatePtr, 2, fun_ptr, NULL);
+   // void (* intermediatePtr)() = (void(*)()) &intermediate;
+  makecontext(&nThread, fun_ptr);
   threads[i] = nThread;
   active_threads[i] = 1;
 }
@@ -79,27 +84,26 @@ void create_new_parameterized_thread(void (*fun_ptr)(void*), void* parameter) {
       i++;
    }
   if(i >= MAX_THREADS) {
-   perror("max: Ran out of threads");
+   // perror("max: Ran out of threads");
    exit(1);
   }
    ucontext_t nThread;
   
-  getcontext(&nThread);
+//   getcontext(&nThread);
 
   // Modify the context to a new stack
-  nThread.uc_stack.ss_sp = malloc(THREAD_STACK_SIZE);
-  nThread.uc_stack.ss_size = THREAD_STACK_SIZE;
-  nThread.uc_stack.ss_flags = 0;
-  if (nThread.uc_stack.ss_sp == 0)
+  nThread.original = malloc(THREAD_STACK_SIZE); //need to properly 
+  nThread.uc_stack = nThread.original + THREAD_STACK_SIZE;
+  if (nThread.original == 0)
   {
-    perror("malloc: Could not allocate stack");
+   //  perror("malloc: Could not allocate stack");
     exit(1);
   }
 
   // Create the new context
 //   void (*intermediatePtr)() = (void(*)()) &intermediate;
 //   makecontext(&nThread, intermediatePtr, 2, fun_ptr, parameter);
-  makecontext(&nThread, void(*) fun_ptr, 0);
+  makecontext(&nThread, fun_ptr);
   threads[i] = nThread;
   active_threads[i] = 1;
 }
@@ -116,7 +120,7 @@ void schedule_threads() {
       }
 
       if(free_thread && to_free >= 0) {
-         free(threads[to_free].uc_stack.ss_sp);
+         free(threads[to_free].original);
          free_thread = false;
          to_free = -1;
       }
@@ -145,11 +149,6 @@ void finish_thread() {
     yield();
 }
 
-
-void main () {
-   test_1();
-}
-
 int count;
 
 void add_10_to_count()
@@ -161,11 +160,14 @@ void add_10_to_count()
   finish_thread();
 }
 
-
-void test_1(CuTest *tc) {
+void test_1() {
   count = 0;
   initialize_basic_threads();
   create_new_thread(add_10_to_count);
   schedule_threads();
   printf("Count: %d\n", count);
+}
+
+void main () {
+   test_1();
 }
