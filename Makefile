@@ -29,7 +29,7 @@ OBJS = \
   $K/kernelvec.o \
   $K/plic.o \
   $K/virtio_disk.o \
-  $K/list.o
+ # $K/list.o
 
 # riscv64-unknown-elf- or riscv64-linux-gnu-
 # perhaps in /opt/riscv/bin
@@ -88,7 +88,7 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o $U/swap.o
+ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o $U/swap.o $U/uspaceThreads.o
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $^
@@ -136,7 +136,6 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
-	$U/_uspaceThreads\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

@@ -6,8 +6,11 @@
 # Change Return Address
 
 
-.globl swtch
-swtch:
+.globl swap
+swap:
+
+        # move a0 into a temporary register. Do the same for a1
+        # Store these in t0, and t1. Replace a0 and a1 with t0 and t1
         sd ra, 0(a0)
         sd sp, 8(a0)
         sd s0, 16(a0)
