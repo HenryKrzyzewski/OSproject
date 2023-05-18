@@ -3,7 +3,7 @@
  *
  *
  */
-#include "uspace_threads.h"
+#include "ucontext.h"
 
 //Pass in old and new contexts
 extern void swap(greg_t*, greg_t*);

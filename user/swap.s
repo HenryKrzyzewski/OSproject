@@ -6,8 +6,8 @@
 # Change Return Address
 
 
-.globl swtch
-swtch:
+.globl swap
+swap:
         sd ra, 0(a0)
         sd sp, 8(a0)
         sd s0, 16(a0)
