@@ -3,7 +3,7 @@
  *
  *
  */
-#include "uspace_threads.h"
+#include "ucontext.h"
 
 //Pass in old and new contexts
 extern void swap(greg_t*, greg_t*);
@@ -20,7 +20,6 @@ void makecontext(ucontext_t* thread, void* func, void* argv1 = 0, void* argv2 = 
     thread->uc_mcontext.gregs[0] = (unsigned long int) &func;
     thread->uc_mcontext.gregs[1] = (unsigned long int) thread->uc_stack;
     thread->fn_ptr = func;
-    // *thread.uc_mcontext = ;
 }
 
 void swapcontext(ucontext_t* oldThread, ucontext_t* newThread) {
