@@ -1,8 +1,7 @@
 #include <malloc.h>
 #include <ucontext.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
+
 #include "basic_threads.h"
 
 // 64kB stack
@@ -85,8 +84,6 @@ void create_new_parameterized_thread(void (*fun_ptr)(void*), void* parameter) {
   }
    ucontext_t nThread;
   
-  
-  //TODO: replace this
   getcontext(&nThread);
 
   // Modify the context to a new stack
@@ -146,4 +143,29 @@ void finish_thread() {
     free_thread = true;
     to_free = currThreadIndex;
     yield();
+}
+
+
+void main () {
+   test_1();
+}
+
+int count;
+
+void add_10_to_count()
+{
+  for(int i = 0; i < 10; i++) {
+    yield();
+    count = count + 1;
+  }
+  finish_thread();
+}
+
+
+void test_1(CuTest *tc) {
+  count = 0;
+  initialize_basic_threads();
+  create_new_thread(add_10_to_count);
+  schedule_threads();
+  printf("Count: %d\n", count);
 }

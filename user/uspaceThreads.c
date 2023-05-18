@@ -8,8 +8,15 @@
 //Pass in old and new contexts
 extern void swap(greg_t*, greg_t*);
 
-void makecontext(ucontext_t* thread, void* func, void* argv1 = 0, void* argv2 = 0, void* argv3 = 0, 
-    void* argv4 = 0, void* argv5 = 0, void* argv6 = 0, void* argv7 = 0, void* argv8 = 0){
+void getcontext(ucontext_t * thread) {
+    
+    mcontext_t mcontext = {};
+    thread->uc_mcontext = mcontext;
+}
+
+void makecontext(ucontext_t* thread, void* func
+//, void* argv1 = 0, void* argv2 = 0, void* argv3 = 0, void* argv4 = 0, void* argv5 = 0, void* argv6 = 0, void* argv7 = 0, void* argv8 = 0
+){
     // for(int i = 0; i < argc; i++) {
     //     //iterate over arguments and store them on the stack
     //     thread.stack_t.ss_sp + (4 * i) = argv[i];
