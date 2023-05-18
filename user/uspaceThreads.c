@@ -19,7 +19,6 @@ void makecontext(ucontext_t* thread, void* func, int argc, void* argv){
     thread->uc_mcontext.gregs[0] = (unsigned long int) &func;
     thread->uc_mcontext.gregs[1] = (unsigned long int) thread->uc_stack;
     thread->fn_ptr = func;
-    // *thread.uc_mcontext = ;
 }
 
 void swapcontext(ucontext_t* oldThread, ucontext_t* newThread) {
