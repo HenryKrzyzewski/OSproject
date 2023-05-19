@@ -58,15 +58,15 @@ void initialize_basic_threads() {
    for(int i = 0; i < MAX_THREADS; i++) {
       active_threads[i] = 0;
    }
-   scheduler.original = malloc(THREAD_STACK_SIZE); //need to properly 
-   scheduler.uc_stack = scheduler.original + THREAD_STACK_SIZE;
-  if (scheduler.original == 0)
-  {
-   //  perror("malloc: Could not allocate stack");
-    exit(1);
-  }
+//    scheduler.original = malloc(THREAD_STACK_SIZE); //need to properly 
+//    scheduler.uc_stack = scheduler.original + THREAD_STACK_SIZE;
+//   if (scheduler.original == 0)
+//   {
+//    //  perror("malloc: Could not allocate stack");
+//     exit(1);
+//   }
   
-   makecontext(&scheduler, schedule_threads);
+//    makecontext(&scheduler, schedule_threads);
 }
 
 void intermediate(void (*fun_ptr)(void*), void* parameter) {
