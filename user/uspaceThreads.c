@@ -19,7 +19,7 @@ void makecontext(ucontext_t* thread, void* func, void* argv1, void* argv2, void*
     
     //set fn_ptr to func
     thread->uc_mcontext.ra = (unsigned long int) func;
-    thread->uc_mcontext.sp = (unsigned long int) thread->original;
+    thread->uc_mcontext.sp = (unsigned long int) thread->uc_stack;
     thread->fn_ptr = func;
 }
 
