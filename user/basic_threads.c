@@ -32,6 +32,23 @@ int currThreadIndex = 0;
 
 int count;
 
+void display_context (ucontext_t* cont) {
+   void* stack = cont->uc_stack;
+   void* original = cont->original;
+   mcontext_t regset = cont->uc_mcontext;
+
+   uint64 ra = regset.ra;
+   uint64 sp = regset.sp;
+   uint64 a0 = regset.a0;
+   uint64 a1 = regset.a1;
+   uint64 a2 = regset.a2;
+
+   void* func = cont->fn_ptr;
+
+   printf("\n-- CONTEXT INFORMATION --\nStack: %p\nOriginal: %p\nRegisters...\n   ra: %p\n   sp: %p\n   a0: %d\n   a1: %d\n   a2: %d\nFunction: %p\n-- END --\n\n", stack, original, ra, sp, a0, a1, a2, func);
+
+}
+
 void add_10_to_count()
 {
    printf("Starting thread function\n");
@@ -40,7 +57,7 @@ void add_10_to_count()
       yield();
       count = count + 1;
    }
-   printf("Yielding\n");
+   // printf("Yielding\n");
    finish_thread();
 }
 
@@ -177,9 +194,13 @@ void schedule_threads()
       if (active_threads[currThreadIndex] == 1)
       {
          printf("Swapping to thread %d\n", currThreadIndex);
+         printf("BEFORE\n");
+         display_context(&scheduler);
+         display_context(&threads[currThreadIndex]);
          swapcontext(&scheduler, &threads[currThreadIndex]);
-         printf("returned from process\n");
       }
+
+      printf("HERE %d\n", free_thread);
 
       if (free_thread && to_free >= 0)
       {
@@ -208,7 +229,11 @@ void schedule_threads()
 void yield()
 {
    printf("Yielding\n");
-   swapcontext(&threads[currThreadIndex], &scheduler);
+            printf("AFTER\n");
+         display_context(&scheduler);
+         display_context(&threads[currThreadIndex]);
+         printf("returned from process\n");
+   swapcontext(&threads[currThreadIndex], &scheduler); //problems here 
 }
 
 void finish_thread()
@@ -223,5 +248,5 @@ void finish_thread()
 void main()
 {
    printf("%d\n", &add_10_to_count);
-   test_1();
+   test_2a();
 }

@@ -44,7 +44,6 @@ swap:
         ld s9, 112(a1)
         ld s10, 120(a1)
         ld s11, 128(a1)
-        
-        ret
 
-	
+#       move a0, t0
+#  
