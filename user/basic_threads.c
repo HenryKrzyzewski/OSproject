@@ -29,22 +29,35 @@ ucontext_t scheduler;
 int to_free = -1;
 bool free_thread = false;
 int currThreadIndex = 0;
-int numfinished = 0;
-int numThreads = 0;
 
 int count;
+
+void display_context (ucontext_t* cont) {
+   void* stack = cont->uc_stack;
+   void* original = cont->original;
+   mcontext_t regset = cont->uc_mcontext;
+
+   uint64 ra = regset.ra;
+   uint64 sp = regset.sp;
+   uint64 a0 = regset.a0;
+   uint64 a1 = regset.a1;
+   uint64 a2 = regset.a2;
+
+   void* func = cont->fn_ptr;
+
+   printf("\n-- CONTEXT INFORMATION --\nStack: %p\nOriginal: %p\nRegisters...\n   ra: %p\n   sp: %p\n   a0: %d\n   a1: %d\n   a2: %d\nFunction: %p\n-- END --\n\n", stack, original, ra, sp, a0, a1, a2, func);
+
+}
 
 void add_10_to_count()
 {
    printf("Starting thread function\n");
    for (int i = 0; i < 10; i++)
    {
-      printf("i: %d\n", i);
       yield();
       count = count + 1;
-      printf("count: %d\n", count);
    }
-   printf("Yielding\n");
+   // printf("Yielding\n");
    finish_thread();
 }
 
@@ -134,7 +147,7 @@ void create_new_thread(void (*fun_ptr)())
       exit(1);
    }
    makecontext(&nThread, fun_ptr, 0, 0, 0);
-   numThreads ++;
+
    threads[i] = nThread;
    active_threads[i] = 1;
    printf("Thread created\n");
@@ -171,58 +184,61 @@ void create_new_parameterized_thread(void (*fun_ptr)(void *), void *parameter)
 void schedule_threads()
 {
    printf("Scheduler Beginning\n");
-   while (numfinished < numThreads)
+   while (!finished)
    {
-      printf("Schedule loop: index: %d\n", currThreadIndex);
       if (active_threads[currThreadIndex] == 0)
       {
-         
          currThreadIndex = 0;
       }
+
       if (active_threads[currThreadIndex] == 1)
       {
          printf("Swapping to thread %d\n", currThreadIndex);
+         printf("BEFORE\n");
+         display_context(&scheduler);
+         display_context(&threads[currThreadIndex]);
          swapcontext(&scheduler, &threads[currThreadIndex]);
-         printf("returned from process\n");
       }
-      printf("returned from loop\n");
-      printf("index: %d\n", currThreadIndex);
-      
+
+      printf("HERE %d\n", free_thread);
+
       if (free_thread && to_free >= 0)
       {
-         printf("freeing\n");
          free(threads[to_free].original);
          free_thread = false;
          to_free = -1;
       }
-      printf("about to inc\n");
-      currThreadIndex ++;
-      printf("incremented\n");
-      // for (int i = 0; i < MAX_THREADS; i++)
-      // {
-      //    if (active_threads[i])
-      //    {
-      //       finished = 0;
-      //       break;
-      //    }
-      //    else
-      //    {
-      //       printf("finished\n");
-      //       finished = 1;
-      //    }
-      // }
+
+      currThreadIndex++;
+
+      for (int i = 0; i < MAX_THREADS; i++)
+      {
+         if (active_threads[i])
+         {
+            finished = 0;
+            break;
+         }
+         else
+         {
+            finished = 1;
+         }
+      }
    }
 }
 
 void yield()
 {
-   swapcontext(&threads[currThreadIndex], &scheduler);
+   printf("Yielding\n");
+            printf("AFTER\n");
+         display_context(&scheduler);
+         display_context(&threads[currThreadIndex]);
+         printf("returned from process\n");
+   swapcontext(&threads[currThreadIndex], &scheduler); //problems here 
 }
 
 void finish_thread()
 {
    printf("Thread finished\n");
-   numfinished ++;
    active_threads[currThreadIndex] = 0;
    free_thread = true;
    to_free = currThreadIndex;
@@ -232,5 +248,5 @@ void finish_thread()
 void main()
 {
    printf("%d\n", &add_10_to_count);
-   test_1();
+   test_2a();
 }
