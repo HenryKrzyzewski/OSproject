@@ -44,11 +44,39 @@ void add_10_to_count()
   finish_thread();
 }
 
+void add_3_to_count()
+{
+  for(int i = 0; i < 3; i++) {
+    yield();
+    count = count + 1;
+  }
+  finish_thread();
+}
+
 void test_1() {
   initialize_basic_threads();
   create_new_thread(&add_10_to_count);
   schedule_threads();
-  printf("Count: %d\n", count);
+  printf("Expected: 10, Actual: %d\n", count);
+}
+
+void test_2a() {
+  count = 0;
+  initialize_basic_threads();
+  create_new_thread(add_10_to_count);
+  create_new_thread(add_10_to_count);
+  schedule_threads();
+  printf("Expected: 20, Actual: %d\n", count);
+}
+
+void test_2b() {
+  count = 0;
+  initialize_basic_threads();
+  create_new_thread(add_3_to_count);
+  create_new_thread(add_10_to_count);
+  create_new_thread(add_3_to_count);
+  schedule_threads();
+  printf("Expected: 16, Actual: %d\n", count);
 }
 
 
@@ -80,25 +108,19 @@ void create_new_thread(void (*fun_ptr)()) {
       i++;
    }
   if(i >= MAX_THREADS) {
-   // perror("max: Ran out of threads");
    exit(1);
   }
    ucontext_t nThread;
-  // Get the current execution context
-//   nThread = {}
 
   // Modify the context to a new stack
-  nThread.original = malloc(THREAD_STACK_SIZE); //need to properly 
+  nThread.original = malloc(THREAD_STACK_SIZE); 
   nThread.uc_stack = nThread.original + THREAD_STACK_SIZE;
   if (nThread.original == 0)
   {
-   //  perror("malloc: Could not allocate stack");
     exit(1);
   }
 
   // Create the new context
-//   void (*intermediatePtr)() = (void(*)()) &intermediate;
-   // void (* intermediatePtr)() = (void(*)()) &intermediate;
   makecontext(&nThread, fun_ptr);
   threads[i] = nThread;
   active_threads[i] = 1;
@@ -114,26 +136,20 @@ void create_new_parameterized_thread(void (*fun_ptr)(void*), void* parameter) {
       i++;
    }
   if(i >= MAX_THREADS) {
-   // perror("max: Ran out of threads");
    exit(1);
   }
    ucontext_t nThread;
-  
-//   getcontext(&nThread);
 
   // Modify the context to a new stack
   nThread.original = malloc(THREAD_STACK_SIZE); //need to properly 
   nThread.uc_stack = nThread.original + THREAD_STACK_SIZE;
   if (nThread.original == 0)
   {
-   //  perror("malloc: Could not allocate stack");
     exit(1);
   }
 
   // Create the new context
-//   void (*intermediatePtr)() = (void(*)()) &intermediate;
-//   makecontext(&nThread, intermediatePtr, 2, fun_ptr, parameter);
-  makecontext(&nThread, fun_ptr);
+  makecontext(&nThread, fun_ptr, parameter);
   
   threads[i] = nThread;
   active_threads[i] = 1;
