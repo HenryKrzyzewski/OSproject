@@ -15,6 +15,7 @@ typedef struct {
 	mcontext_t uc_mcontext;
 	int id;
 	void* fn_ptr;
+  int state;
 }ucontext_t;
  
 void swapcontext(ucontext_t* oldThread, ucontext_t* newThread);
