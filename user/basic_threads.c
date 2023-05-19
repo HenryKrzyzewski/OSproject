@@ -31,6 +31,26 @@ int to_free = -1;
 bool free_thread = false;
 int currThreadIndex = 0;
 
+int count;
+
+void add_10_to_count()
+{
+   printf("Starting thread function\n");
+  for(int i = 0; i < 10; i++) {
+    yield();
+    count = count + 1;
+  }
+  printf("Yielding\n");
+  finish_thread();
+}
+
+void test_1() {
+  initialize_basic_threads();
+  create_new_thread(&add_10_to_count);
+  schedule_threads();
+  printf("Count: %d\n", count);
+}
+
 
 void initialize_basic_threads() {
    finished = false;
@@ -38,6 +58,15 @@ void initialize_basic_threads() {
    for(int i = 0; i < MAX_THREADS; i++) {
       active_threads[i] = 0;
    }
+   scheduler.original = malloc(THREAD_STACK_SIZE); //need to properly 
+   scheduler.uc_stack = scheduler.original + THREAD_STACK_SIZE;
+  if (scheduler.original == 0)
+  {
+   //  perror("malloc: Could not allocate stack");
+    exit(1);
+  }
+  
+   makecontext(&scheduler, schedule_threads);
 }
 
 void intermediate(void (*fun_ptr)(void*), void* parameter) {
@@ -73,6 +102,7 @@ void create_new_thread(void (*fun_ptr)()) {
   makecontext(&nThread, fun_ptr);
   threads[i] = nThread;
   active_threads[i] = 1;
+  printf("Thread created\n");
 }
 
 
@@ -104,18 +134,21 @@ void create_new_parameterized_thread(void (*fun_ptr)(void*), void* parameter) {
 //   void (*intermediatePtr)() = (void(*)()) &intermediate;
 //   makecontext(&nThread, intermediatePtr, 2, fun_ptr, parameter);
   makecontext(&nThread, fun_ptr);
+  
   threads[i] = nThread;
   active_threads[i] = 1;
 }
 
 
 void schedule_threads() {
+   printf("Scheduler Beginning\n");
    while(!finished) {
       if(active_threads[currThreadIndex] == 0) {
          currThreadIndex = 0;
       }
 
       if(active_threads[currThreadIndex] == 1) {
+         printf("Swapping to thread %d\n", currThreadIndex);
          swapcontext(&scheduler, &threads[currThreadIndex]);
       }
 
@@ -139,34 +172,19 @@ void schedule_threads() {
 }
 
 void yield() {
+   printf("Yielding\n");
    swapcontext(&threads[currThreadIndex], &scheduler);
 }
 
 void finish_thread() {
+   printf("Thread finished\n");
     active_threads[currThreadIndex] = 0;
     free_thread = true;
     to_free = currThreadIndex;
     yield();
 }
 
-int count;
 
-void add_10_to_count()
-{
-  for(int i = 0; i < 10; i++) {
-    yield();
-    count = count + 1;
-  }
-  finish_thread();
-}
-
-void test_1() {
-  count = 0;
-  initialize_basic_threads();
-  create_new_thread(add_10_to_count);
-  schedule_threads();
-  printf("Count: %d\n", count);
-}
 
 void main () {
    test_1();
