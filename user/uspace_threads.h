@@ -6,7 +6,7 @@ typedef uint64 greg_t;
 
 typedef struct gregset
    {
-     greg_t gregs[14];
+     greg_t gregs[22];
    } mcontext_t;
 
 typedef struct {

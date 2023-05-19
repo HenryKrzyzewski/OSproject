@@ -110,18 +110,17 @@ void create_new_thread(void (*fun_ptr)()) {
   if(i >= MAX_THREADS) {
    exit(1);
   }
-   ucontext_t nThread;
 
-  // Modify the context to a new stack
+ucontext_t nThread;
   nThread.original = malloc(THREAD_STACK_SIZE); 
   nThread.uc_stack = nThread.original + THREAD_STACK_SIZE;
   if (nThread.original == 0)
   {
     exit(1);
   }
-
-  // Create the new context
   makecontext(&nThread, fun_ptr);
+
+
   threads[i] = nThread;
   active_threads[i] = 1;
   printf("Thread created\n");
