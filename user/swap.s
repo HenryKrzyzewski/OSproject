@@ -9,9 +9,6 @@
 .globl swap
 swap:
 
-#       THIS NEEDS FIXED
-#       need to change registers
-
         move a0, t0
         move a1, t1
 

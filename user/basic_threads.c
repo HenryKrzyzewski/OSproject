@@ -118,7 +118,7 @@ ucontext_t nThread;
   {
     exit(1);
   }
-  makecontext(&nThread, fun_ptr);
+  makecontext(&nThread, fun_ptr, 0, 0, 0, 0, 0, 0, 0, 0);
 
 
   threads[i] = nThread;
@@ -148,7 +148,7 @@ void create_new_parameterized_thread(void (*fun_ptr)(void*), void* parameter) {
   }
 
   // Create the new context
-  makecontext(&nThread, fun_ptr, parameter);
+  makecontext(&nThread, fun_ptr, parameter, 0, 0, 0, 0, 0, 0, 0);
   
   threads[i] = nThread;
   active_threads[i] = 1;

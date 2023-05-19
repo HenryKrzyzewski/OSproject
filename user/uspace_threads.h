@@ -19,8 +19,7 @@ typedef struct {
 }ucontext_t;
  
 void swapcontext(ucontext_t* oldThread, ucontext_t* newThread);
-void makecontext(ucontext_t* thread, void* func , void* argv1 = 0, void* argv2 = 0, void* argv3 = 0, 
-    void* argv4 = 0, void* argv5 = 0, void* argv6 = 0, void* argv7 = 0, void* argv8 = 0
+void makecontext(ucontext_t* thread, void* func , void* argv1, void* argv2, void* argv3, void* argv4, void* argv5, void* argv6, void* argv7, void* argv8
 );
 
 
