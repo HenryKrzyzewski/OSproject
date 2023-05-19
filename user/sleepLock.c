@@ -1,5 +1,6 @@
 // Sleeping locks
 
+
 #include "types.h"
 #include "riscv.h"
 #include "defs.h"
@@ -8,46 +9,46 @@
 #include "../kernel/spinlock.h"
 #include "../kernel/proc.h"
 #include "sleeplock.h"
+#include "ucontext.h"
 
 void
-initsleeplock(struct sleeplock *lk, char *name)
+initsleeplock(struct sleeplock *lk)
 {
-  initlock(&lk->lk, "sleep lock"); //need to implement?
-  lk->name = name;
+  initlock(&lk->lk, "sleep lock"); 
   lk->locked = 0;
   lk->pid = 0;
 }
 
 void
-acquiresleep(struct sleeplock *lk)
+acquiresleep(struct sleeplock *lk, ucontext_t* thread)
 {
-  acquire(&lk->lk); //need to implement?
+  acquire(&lk->lk); 
   while (lk->locked) {
-    sleep(lk, &lk->lk); //need to implement?
+    sleep(lk, &lk->lk); 
   }
   lk->locked = 1;
-  lk->pid = myproc()->pid; //should we just pass in the pid?
+  lk->pid =thread->id; 
   release(&lk->lk);
 }
 
 void
 releasesleep(struct sleeplock *lk)
 {
-  acquire(&lk->lk); //need to implement?
+  acquire(&lk->lk);
   lk->locked = 0;
   lk->pid = 0;
-  wakeup(lk); //need to implement?
-  release(&lk->lk); //need to implement?
+  wakeup(lk); 
+  release(&lk->lk); 
 }
 
 int
-holdingsleep(struct sleeplock *lk)
+holdingsleep(struct sleeplock *lk, , ucontext_t* thread)
 {
   int r;
   
-  acquire(&lk->lk); //need to implement?
-  r = lk->locked && (lk->pid == myproc()->pid); //should we just pass in the pid?
-  release(&lk->lk); //need to implement?
+  acquire(&lk->lk); 
+  r = lk->locked && (lk->pid == thread->id`); 
+  release(&lk->lk); 
   return r;
 }
 
