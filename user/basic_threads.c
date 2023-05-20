@@ -1,6 +1,3 @@
-// #include <malloc.h>
-// #include <ucontext.h>
-// #include <stdio.h>
 
 #include "kernel/types.h"
 #include "kernel/stat.h"
@@ -12,18 +9,18 @@
 // 64kB stack
 #define THREAD_STACK_SIZE 1024 * 64
 
-/*
-   max number of threads
-   */
 #define MAX_THREADS 5
 typedef int bool;
 #define false 0
 #define true 1
 
-// storage for your thread data
+// storage for threads
 ucontext_t threads[MAX_THREADS];
+
+//concurrency lock
 struct sleeplock lock;
-// add additional constants and globals here as you need
+
+//  additional constants and globals
 int active_threads[MAX_THREADS];
 bool finished = false;
 ucontext_t scheduler;
@@ -33,9 +30,10 @@ int currThreadIndex = 0;
 
 int count;
 
-void display_context (ucontext_t* cont) {
-   void* stack = cont->uc_stack;
-   void* original = cont->original;
+void display_context(ucontext_t *cont)
+{
+   void *stack = cont->uc_stack;
+   void *original = cont->original;
    mcontext_t regset = cont->uc_mcontext;
 
    uint64 ra = regset.ra;
@@ -44,15 +42,13 @@ void display_context (ucontext_t* cont) {
    uint64 a1 = regset.a1;
    uint64 a2 = regset.a2;
 
-   void* func = cont->fn_ptr;
+   void *func = cont->fn_ptr;
 
    printf("\n-- CONTEXT INFORMATION --\nStack: %p\nOriginal: %p\nRegisters...\n   ra: %p\n   sp: %p\n   a0: %d\n   a1: %d\n   a2: %d\nFunction: %p\n-- END --\n\n", stack, original, ra, sp, a0, a1, a2, func);
-
 }
 
 void add_10_to_count()
 {
-   printf("Starting thread function\n");
    for (int i = 0; i < 10; i++)
    {
       yield();
@@ -109,16 +105,6 @@ void initialize_basic_threads()
       active_threads[i] = 0;
    }
    initsleeplock(&lock);
-   
-   //    scheduler.original = malloc(THREAD_STACK_SIZE);
-   //    scheduler.uc_stack = scheduler.original + THREAD_STACK_SIZE;
-   //   if (scheduler.original == 0)
-   //   {
-   //    //  perror("malloc: Could not allocate stack");
-   //     exit(1);
-   //   }
-
-      //makecontext(&scheduler, schedule_threads, 0, 0, 0);
 }
 
 void intermediate(void (*fun_ptr)(void *), void *parameter)
@@ -151,7 +137,6 @@ void create_new_thread(void (*fun_ptr)())
 
    threads[i] = nThread;
    active_threads[i] = 1;
-   printf("Thread created\n");
 }
 
 void create_new_parameterized_thread(void (*fun_ptr)(void *), void *parameter)
@@ -167,15 +152,15 @@ void create_new_parameterized_thread(void (*fun_ptr)(void *), void *parameter)
    }
    ucontext_t nThread;
 
-   // Modify the context to a new stack
-   nThread.original = malloc(THREAD_STACK_SIZE); // need to properly
+   
+   nThread.original = malloc(THREAD_STACK_SIZE);
    nThread.uc_stack = nThread.original + THREAD_STACK_SIZE;
    if (nThread.original == 0)
    {
+      printf("Malloc error\n");
       exit(1);
    }
 
-   // Create the new context
    makecontext(&nThread, fun_ptr, parameter, 0, 0);
 
    threads[i] = nThread;
@@ -184,7 +169,6 @@ void create_new_parameterized_thread(void (*fun_ptr)(void *), void *parameter)
 
 void schedule_threads()
 {
-   printf("Scheduler Beginning\n");
    while (!finished)
    {
       if (active_threads[currThreadIndex] == 0)
@@ -194,15 +178,12 @@ void schedule_threads()
 
       if (active_threads[currThreadIndex] == 1)
       {
-         printf("Swapping to thread %d\n", currThreadIndex);
-         printf("BEFORE\n");
+         printf("BEFORE SWAP\n");
          display_context(&scheduler);
          display_context(&threads[currThreadIndex]);
-         swapcontext(&scheduler, &threads[currThreadIndex]);
-         printf("Index: %d\n", currThreadIndex);
-      }
 
-      printf("HERE %d\n", free_thread);
+         swapcontext(&scheduler, &threads[currThreadIndex]);
+      }
 
       if (free_thread && to_free >= 0)
       {
@@ -231,11 +212,11 @@ void schedule_threads()
 void yield()
 {
    printf("Yielding\n");
-            printf("AFTER\n");
-         display_context(&scheduler);
-         display_context(&threads[currThreadIndex]);
-         printf("returned from process\n");
-   swapcontext(&threads[currThreadIndex], &scheduler); //problems here 
+   printf("AFTER SWAP\n");
+   display_context(&scheduler);
+   display_context(&threads[currThreadIndex]);
+
+   swapcontext(&threads[currThreadIndex], &scheduler); 
 }
 
 void finish_thread()
