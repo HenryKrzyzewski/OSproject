@@ -7,6 +7,8 @@
 #include "sleepLock.h"
 
 
+//Add functions as system calls
+
 void
 initsleeplock(struct sleeplock *lk)
 {
