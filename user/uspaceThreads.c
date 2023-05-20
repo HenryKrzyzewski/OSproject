@@ -13,9 +13,9 @@ extern void swap(mcontext_t*, mcontext_t*);
 
 void makecontext(ucontext_t* thread, void* func, void* argv1, void* argv2, void* argv3
 ){
-    thread->uc_mcontext.a0 = (uint64) argv1 | 0;
-    thread->uc_mcontext.a1 = (uint64) argv2 | 0;
-    thread->uc_mcontext.a2 = (uint64) argv3 | 0;
+    thread->uc_mcontext.a0 = (uint64) argv1;
+    thread->uc_mcontext.a1 = (uint64) argv2;
+    thread->uc_mcontext.a2 = (uint64) argv3;
     
     //set fn_ptr to func
     thread->uc_mcontext.ra = (unsigned long int) func;

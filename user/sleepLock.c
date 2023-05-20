@@ -1,56 +1,51 @@
 // Sleeping locks
 
 
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "../kernel/param.h"
-#include "../kernel/memlayout.h"
-#include "../kernel/spinlock.h"
-#include "../kernel/proc.h"
-#include "sleeplock.h"
-#include "ucontext.h"
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
+#include "sleepLock.h"
+
 
 void
 initsleeplock(struct sleeplock *lk)
 {
-  initlock(&lk->lk, "sleep lock"); 
+  lk->lk.locked = 0;
   lk->locked = 0;
-  lk->pid = 0;
+  lk->tid = 0;
 }
 
 void
-acquiresleep(struct sleeplock *lk, ucontext_t* thread)
+acquiresleep(struct sleeplock *lk, int id)
 {
-  acquire(&lk->lk); 
+  //acquire(&lk->lk); 
   while (lk->locked) {
-    sleep(lk, &lk->lk); 
+    //sleep(lk, &lk->lk); 
   }
   lk->locked = 1;
-  lk->pid =thread->id; 
-  release(&lk->lk);
+  lk->tid = id; 
+  //release(&lk->lk);
 }
 
 void
 releasesleep(struct sleeplock *lk)
 {
-  acquire(&lk->lk);
+  //acquire(&lk->lk);
   lk->locked = 0;
-  lk->pid = 0;
-  wakeup(lk); 
-  release(&lk->lk); 
+  lk->tid = 0;
+  //wakeup(lk); 
+  //release(&lk->lk); 
 }
 
 int
-holdingsleep(struct sleeplock *lk, , ucontext_t* thread)
+holdingsleep(struct sleeplock *lk, int id)
 {
   int r;
   
-  acquire(&lk->lk); 
-  r = lk->locked && (lk->pid == thread->id`); 
-  release(&lk->lk); 
+ // acquire(&lk->lk); 
+  r = lk->locked && (lk->tid == id); 
+  //release(&lk->lk); 
   return r;
 }
-
 
 

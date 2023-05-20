@@ -7,6 +7,7 @@
 #include "user/user.h"
 #include "basic_threads.h"
 #include "uspace_threads.h"
+#include "sleepLock.h"
 
 // 64kB stack
 #define THREAD_STACK_SIZE 1024 * 64
@@ -21,7 +22,7 @@ typedef int bool;
 
 // storage for your thread data
 ucontext_t threads[MAX_THREADS];
-
+struct sleeplock lock;
 // add additional constants and globals here as you need
 int active_threads[MAX_THREADS];
 bool finished = false;
@@ -57,7 +58,6 @@ void add_10_to_count()
       yield();
       count = count + 1;
    }
-   // printf("Yielding\n");
    finish_thread();
 }
 
@@ -108,6 +108,7 @@ void initialize_basic_threads()
    {
       active_threads[i] = 0;
    }
+   initsleeplock(&lock);
    
    //    scheduler.original = malloc(THREAD_STACK_SIZE);
    //    scheduler.uc_stack = scheduler.original + THREAD_STACK_SIZE;
@@ -117,7 +118,7 @@ void initialize_basic_threads()
    //     exit(1);
    //   }
 
-   //    makecontext(&scheduler, schedule_threads);
+      //makecontext(&scheduler, schedule_threads, 0, 0, 0);
 }
 
 void intermediate(void (*fun_ptr)(void *), void *parameter)
@@ -198,6 +199,7 @@ void schedule_threads()
          display_context(&scheduler);
          display_context(&threads[currThreadIndex]);
          swapcontext(&scheduler, &threads[currThreadIndex]);
+         printf("Index: %d\n", currThreadIndex);
       }
 
       printf("HERE %d\n", free_thread);
@@ -247,6 +249,5 @@ void finish_thread()
 
 void main()
 {
-   printf("%d\n", &add_10_to_count);
    test_2a();
 }

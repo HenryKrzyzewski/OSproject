@@ -2,8 +2,6 @@
 // Header File for userspace threads implementation
 //
 
-typedef uint64 greg_t;
-
 typedef struct
 {
   uint64 ra;

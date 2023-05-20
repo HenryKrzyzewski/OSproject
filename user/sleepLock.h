@@ -1,8 +1,20 @@
-struct sleeplock {
-  uint locked;       // Is the lock held?
-  struct spinlock lk; // spinlock protecting this sleep lock
-  
-  // For debugging:
-  char *name;        // Name of lock.
-  int pid;           // Process holding lock
+struct spinlock {
+  uint locked;       
+
+  // struct cpu *cpu; ?   
 };
+
+struct sleeplock {
+  int locked;       
+  struct spinlock lk; 
+  
+  int tid;           
+};
+
+void initsleeplock(struct sleeplock* lk);
+
+void acquiresleep(struct sleeplock *lk, int id);
+
+void releasesleep(struct sleeplock *lk);
+
+int holdingsleep(struct sleeplock *lk, int id);
